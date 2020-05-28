@@ -3341,13 +3341,21 @@ public class SyntaxTreeBuilderTokenManager implements SyntaxTreeBuilderConstants
 	}
 
 	public String backSlashCorrection(String image){
-		String newImage = "";
-		if (image.equals("\"\\.\"")){
-			newImage = "\"\\\\.\"";
+		StringBuilder newimg = new StringBuilder();
+		int imglen = image.length(), cnt = 0;
+		for(int i = 0; i < imglen; i++) {
+			if(image.charAt(i) == '\\') {
+				cnt++;
+			} else if (cnt % 2 == 1) {
+				newimg.append('\\');
+				cnt = 0;
+			}
+			newimg.append(image.charAt(i));
 		}
-		else{
-			newImage = image;
+		if (cnt % 2 == 1) {
+			newimg.append('\\');
 		}
+		String newImage = new String(newimg);
 		return newImage;
 	}
 
@@ -3366,7 +3374,6 @@ public class SyntaxTreeBuilderTokenManager implements SyntaxTreeBuilderConstants
 		endColumn = input_stream.getEndColumn();
 		String newImage = backSlashCorrection(curTokenImage);
 		t = Token.newToken(jjmatchedKind, newImage);
-		System.out.println("kind: "+jjmatchedKind + "string: " + newImage);
 
 		t.beginLine = beginLine;
 		t.endLine = endLine;
